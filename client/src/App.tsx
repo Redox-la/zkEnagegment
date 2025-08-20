@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAudio } from "./lib/stores/useAudio";
+import { useAuth } from "./lib/stores/useAuth";
+import LoginForm from "./components/auth/LoginForm";
+import SignupForm from "./components/auth/SignupForm";
 import Dashboard from "./components/game/Dashboard";
 import GoalSetter from "./components/game/GoalSetter";
 import QuestSystem from "./components/game/QuestSystem";
@@ -9,29 +12,82 @@ import SocialFeed from "./components/game/SocialFeed";
 import { useCommitment } from "./lib/stores/useCommitment";
 import { Button } from "./components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { Trophy, Target, Users, Zap, Settings } from "lucide-react";
+import { Trophy, Target, Users, Zap, LogOut } from "lucide-react";
 import "@fontsource/inter";
 
 const queryClient = new QueryClient();
 
 function GameContent() {
+  const { user: authUser, isAuthenticated, isLoading, error, login, signup, logout, clearError } = useAuth();
   const { currentUser, initializeUser } = useCommitment();
   const { toggleMute, isMuted } = useAudio();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
   useEffect(() => {
-    // Initialize user if not exists
-    if (!currentUser) {
-      initializeUser("Player1");
+    // Initialize commitment user when authenticated user exists
+    if (isAuthenticated && authUser && !currentUser) {
+      initializeUser(authUser.username);
     }
-  }, [currentUser, initializeUser]);
+  }, [isAuthenticated, authUser, currentUser, initializeUser]);
 
+  const handleLogin = async (username: string, password: string) => {
+    clearError();
+    await login(username, password);
+  };
+
+  const handleSignup = async (username: string, password: string) => {
+    clearError();
+    await signup(username, password);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setActiveTab("dashboard");
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p>Processing...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show authentication screens if not authenticated
+  if (!isAuthenticated) {
+    if (authMode === 'signup') {
+      return (
+        <SignupForm
+          onSignup={handleSignup}
+          onSwitchToLogin={() => setAuthMode('login')}
+          isLoading={isLoading}
+          error={error || undefined}
+        />
+      );
+    }
+    
+    return (
+      <LoginForm
+        onLogin={handleLogin}
+        onSwitchToSignup={() => setAuthMode('signup')}
+        isLoading={isLoading}
+        error={error || undefined}
+      />
+    );
+  }
+
+  // Show loading if initializing game data
   if (!currentUser) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="text-center text-white">
           <div className="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p>Initializing DeFi Quest Platform...</p>
+          <p>Loading your DeFi Quest data...</p>
         </div>
       </div>
     );
@@ -51,7 +107,8 @@ function GameContent() {
           
           <div className="flex items-center space-x-4">
             <div className="text-white text-sm">
-              <span className="text-purple-300">Level {Math.floor(currentUser.totalXP / 100) + 1}</span>
+              <span className="text-purple-300">@{authUser?.username}</span>
+              <span className="ml-2">Level {Math.floor(currentUser.totalXP / 100) + 1}</span>
               <span className="ml-2">{currentUser.totalXP} XP</span>
             </div>
             <Button
@@ -61,6 +118,14 @@ function GameContent() {
               className="text-white hover:bg-white/10"
             >
               {isMuted ? "🔇" : "🔊"}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="text-white hover:bg-white/10"
+            >
+              <LogOut className="w-4 h-4" />
             </Button>
           </div>
         </div>

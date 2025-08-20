@@ -223,6 +223,12 @@ export class MemStorage implements IStorage {
     const goal: Goal = {
       ...goalData,
       id,
+      description: goalData.description || null,
+      progress: goalData.progress || 0,
+      completed: goalData.completed || false,
+      difficulty: goalData.difficulty || 'medium',
+      startDate: goalData.startDate || new Date(),
+      targetAmount: goalData.targetAmount || null,
       createdAt: new Date(),
       completedAt: null,
     };
@@ -271,7 +277,7 @@ export class MemStorage implements IStorage {
     const userQuestsList: (UserQuest & { quest: Quest })[] = [];
     
     // Get all quests and create user quest entries if they don't exist
-    for (const quest of this.quests.values()) {
+    for (const quest of Array.from(this.quests.values())) {
       const key = `${userId}-${quest.id}`;
       let userQuest = this.userQuests.get(key);
       
@@ -372,6 +378,7 @@ export class MemStorage implements IStorage {
     const proof: ZKProof = {
       ...proofData,
       id,
+      goalId: proofData.goalId || null,
       verified: true, // Auto-verify for demo
       verifiedAt: new Date(),
       createdAt: new Date(),
