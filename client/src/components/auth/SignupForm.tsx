@@ -13,7 +13,7 @@ interface SignupFormProps {
 }
 
 export default function SignupForm({ onSignup, onSwitchToLogin, isLoading, error }: SignupFormProps) {
-  const [username, setUsername] = useState("");
+  const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +61,7 @@ export default function SignupForm({ onSignup, onSwitchToLogin, isLoading, error
                   id="username"
                   type="text"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Choose a username"
                   className="bg-white/10 border-purple-500/30 text-white placeholder:text-gray-400"
                   disabled={isLoading}

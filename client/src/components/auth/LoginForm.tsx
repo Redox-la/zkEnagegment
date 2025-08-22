@@ -32,14 +32,14 @@ export default function LoginForm({ onLogin, onSwitchToSignup, isLoading, error 
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mb-4">
             <Zap className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">DeFi Quest</h1>
-          <p className="text-purple-200">Level up your DeFi game</p>
+          <h1 className="text-3xl font-bold text-white mb-2">zkEngage</h1>
+          <p className="text-purple-200">Level up your zkEngage backed up by zkVerify</p>
         </div>
 
         <Card className="bg-black/20 backdrop-blur-lg border-purple-500/20">
           <CardHeader>
             <h2 className="text-2xl font-bold text-white text-center">Welcome Back</h2>
-            <p className="text-purple-200 text-center">Sign in to continue your DeFi journey</p>
+            <p className="text-purple-200 text-center">Sign in to continue your Engagement</p>
           </CardHeader>
           
           <CardContent className="space-y-4">
@@ -51,7 +51,7 @@ export default function LoginForm({ onLogin, onSwitchToSignup, isLoading, error 
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-white">Username</Label>
+                <Label htmlFor="username" className="text-white">Username/email</Label>
                 <Input
                   id="username"
                   type="text"
