@@ -86,3 +86,17 @@ export function serveStatic(app: Express) {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
+
+
+export function attachYap(server: any) {
+  const wss = new (require('ws').WebSocketServer)({ server, path: '/yap' })
+  wss.on('connection', (ws: any) => {
+    ws.on('message', (msg: Buffer) => {
+      const text = msg.toString()
+      wss.clients.forEach((client: any) => {
+        if (client.readyState === 1) client.send(text)
+      })
+    })
+  })
+  console.log('Yapping WS attached')
+}
